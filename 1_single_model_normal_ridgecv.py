@@ -102,8 +102,8 @@ if __name__=="__main__":
     length_of_features = train_x.shape[1]
     
     # 4 Start evolving and tunning
-    populations = 20
-    generations = 5
+    populations = 200
+    generations = 60
     
     selector = FeatureSelectionGA(bench_model,total_data_cache,length_of_features,nm_penalty,probability)
     print("70 generations are required to find the best individual. Please wait~~")
