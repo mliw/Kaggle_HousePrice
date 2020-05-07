@@ -40,36 +40,8 @@ def extract_pd(test_x,prediction):
     result = pd.DataFrame(prediction,index = test_x.index, columns = ["SalePrice"])
     return result
 
-    
-if __name__=="__main__":
 
-    # 1 Load total_data_cache
-    train_x = data_help.train_x
-    train_y = data_help.train_y
-    test_x = data_help.test_x
-    total_data_cache = [train_x,train_y,test_x]
-
-    
-    # 2 Load single models
-    kernel_ridge = "kernel_ridge/18_cv_score_0.12159994359671814.pkl"
-    kernel_ridge_1 = "kernel_ridge_1/17_cv_score_0.1251302603769785.pkl"  
-    normal_lassocv = "normal_lassocv/16_cv_score_0.1187955569179603.pkl"
-    normal_ridge_1 = "normal_ridge_1/12_cv_score_0.11878363932182247.pkl" 
-    normal_ridgecv = "normal_ridgecv/15_cv_score_0.11913607429024443_0.11877687235059194.pkl" 
-    svr_2 = "svr_2/21_cv_score_0.1290585687907948_0.11893776133003112.pkl" 
-    lightgbm = "lightgbm/8_cv_score_0.13067732970638146_0.13042870103814302.pkl" 
-    
-    kernel_ridge = extract(kernel_ridge)
-    kernel_ridge_1 = extract(kernel_ridge_1)
-    normal_lassocv = extract(normal_lassocv)
-    normal_ridge_1 = extract(normal_ridge_1)
-    normal_ridgecv = extract(normal_ridgecv)
-    svr_2 = extract(svr_2)
-    lightgbm = extract(lightgbm)
-    
-    
-    # 3 Produce holdout
-    model_list = [kernel_ridge,kernel_ridge_1,normal_lassocv,normal_ridge_1,normal_ridgecv,svr_2,lightgbm]
+def test_combination(model_list):
     holdout_collect = []
     for model in model_list:
         holdout_collect.append(produce_holdout(model,total_data_cache).values.reshape(-1))
@@ -93,13 +65,78 @@ if __name__=="__main__":
     # 3.2 Test holdout prediction
     final_holdout = np.sum(holdout_collect*final_weight,axis = 1)
     holdout_err = np.sqrt(mean_squared_error(train_y,final_holdout))
+    
+    return final_weight,holdout_err
 
-       
+    
+if __name__=="__main__":
+
+    # 1 Load total_data_cache
+    train_x = data_help.train_x
+    train_y = data_help.train_y
+    test_x = data_help.test_x
+    total_data_cache = [train_x,train_y,test_x]
+
+    
+    # 2 Load single models
+    kernel_ridge = "kernel_ridge/18_cv_score_0.12159994359671814.pkl"
+    kernel_ridge_1 = "kernel_ridge_1/17_cv_score_0.1251302603769785.pkl"  
+    normal_lassocv = "normal_lassocv/16_cv_score_0.1187955569179603.pkl"
+    normal_ridge_1 = "normal_ridge_1/12_cv_score_0.11878363932182247.pkl" 
+    normal_ridgecv = "normal_ridgecv/15_cv_score_0.11913607429024443_0.11877687235059194.pkl" 
+    svr_2 = "svr_2/21_cv_score_0.1290585687907948_0.11893776133003112.pkl" 
+    lightgbm = "lightgbm/8_cv_score_0.13067732970638146_0.13042870103814302.pkl"
+    xgb = "xgb/8_cv_score_0.12822817177668067.pkl"    
+    
+    kernel_ridge = extract(kernel_ridge)
+    kernel_ridge_1 = extract(kernel_ridge_1)
+    normal_lassocv = extract(normal_lassocv)
+    normal_ridge_1 = extract(normal_ridge_1)
+    normal_ridgecv = extract(normal_ridgecv)
+    svr_2 = extract(svr_2)
+    lightgbm = extract(lightgbm)
+    xgb = extract(xgb)
+    
+    
+    # 3 Test different combination
+    model_list = [kernel_ridge,kernel_ridge_1,normal_lassocv,normal_ridge_1,normal_ridgecv,svr_2,lightgbm,xgb]
+    key_list = ["kernel_ridge","kernel_ridge_1","normal_lassocv","normal_ridge_1","normal_ridgecv","svr_2","lightgbm","xgb"]
+    model_dic = dict(zip(key_list,model_list))
+    
+    result = {} 
+    record_list = []
+    while True:
+        record_err = float("inf")
+        for md_key in key_list:
+            tem_record_list = record_list.copy()
+            tem_record_list.append(model_dic[md_key])
+            weight,err = test_combination(tem_record_list)
+            if err<record_err:
+                record_err = err
+                md_to_add = model_dic[md_key]
+                key_to_add = md_key
+                print(record_err)
+        record_list.append(md_to_add)
+        print(len(record_list))
+        print("="*30)
+        result.update({len(record_list):[record_err,record_list.copy()]})    
+        key_list = list(set(key_list)-set([key_to_add]))   
+        if len(key_list)==0:
+            break
+        
+    print("="*30)                
+    for key in result.keys():      
+        print(key,result[key][0])
+    print("="*30)
+    
+    final_model_list = result[4][1]
+    final_weight,err = test_combination(final_model_list)
+    
+ 
     # 4 Produce weighted prediction,fitting
-    model_list = [kernel_ridge,kernel_ridge_1,normal_lassocv,normal_ridge_1,normal_ridgecv,svr_2,lightgbm]
     prediction_collect = [] 
     fitting_collect = []    
-    for my_model in model_list:   
+    for my_model in final_model_list:   
         model = my_model["model"]
         features = my_model["name"]
         model.fit(train_x.loc[:,features],train_y)
