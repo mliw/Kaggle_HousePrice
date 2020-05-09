@@ -103,7 +103,7 @@ if __name__=="__main__":
     
     # 4 Start evolving and tunning
     populations = 200 
-    generations = 60
+    generations = 30
     selector = FeatureSelectionGA(bench_model,total_data_cache,length_of_features,nm_penalty,probability)
     print("60 generations are required to find the best individual. Please wait~~")
     selector.generate(populations,ngen=generations,cxpb=0.1,mutxpb=0.8)
@@ -130,7 +130,7 @@ if __name__=="__main__":
             count+=1            
             
     # 4.1 Save original models and tunned models
-    items = result_collect[len(result_collect)//2]
+    items = result_collect[-1]
     saved_str = items["saved_str"]        
     with open(key+"/"+saved_str+".pkl","wb") as f:
         pickle.dump(items,f)
@@ -149,7 +149,7 @@ if __name__=="__main__":
     best = hyperopt.fmin(objective,
         space=XGBRegressor_dic,
         algo=hyperopt.tpe.suggest,
-        max_evals=500,
+        max_evals=1000,
         trials=trials)      
     
     best_para = change_best_XGBRegressor(best)

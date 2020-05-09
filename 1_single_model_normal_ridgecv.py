@@ -103,10 +103,10 @@ if __name__=="__main__":
     
     # 4 Start evolving and tunning
     populations = 200
-    generations = 60
+    generations = 35
     
     selector = FeatureSelectionGA(bench_model,total_data_cache,length_of_features,nm_penalty,probability)
-    print("70 generations are required to find the best individual. Please wait~~")
+    print("35 generations are required to find the best individual. Please wait~~")
     selector.generate(populations,ngen=generations,cxpb=0.1,mutxpb=0.8)
 
     record = selector.best_generations
@@ -131,45 +131,45 @@ if __name__=="__main__":
             count+=1            
             
     # 4.1 Save original models and tunned models
-    for items in result_collect:
-        saved_str = items["saved_str"]        
-        with open(key+"/"+saved_str+".pkl","wb") as f:
-            pickle.dump(items,f)
-        items["model"].fit(train_x.loc[:,items["name"]],train_y)
-        prediction = np.expm1(items["model"].predict(test_x.loc[:,items["name"]]))
-        submission = extract_pd(test_x,prediction)  
-        submission.to_csv(key+"/"+saved_str+".csv")
+    items = result_collect[-1]
+    saved_str = items["saved_str"]        
+    with open(key+"/"+saved_str+".pkl","wb") as f:
+        pickle.dump(items,f)
+    items["model"].fit(train_x.loc[:,items["name"]],train_y)
+    prediction = np.expm1(items["model"].predict(test_x.loc[:,items["name"]]))
+    submission = extract_pd(test_x,prediction)  
+    submission.to_csv(key+"/"+saved_str+".csv")
 
-        # Tunning model_para
-        tunning_train_x = train_x.loc[:,items["name"]] 
-        def objective(param):
-            fit_intercept = param["fit_intercept"]
-            normalize = param["normalize"]
-            alphas = np.array([param["a1"],param["a2"],param["a3"]])
-            tuning_pipeline = make_pipeline(RobustScaler(),RidgeCV(fit_intercept=fit_intercept,normalize=normalize,alphas=alphas))
-            loss = -nm_penalty(tuning_pipeline,[tunning_train_x,train_y],np.ones(tunning_train_x.shape[1]))
-            return loss  
-        trials = hyperopt.Trials()
-        best = hyperopt.fmin(objective,
-            space=normal_ridge_dic,
-            algo=hyperopt.tpe.suggest,
-            max_evals=400,
-            trials=trials)      
+    # Tunning model_para
+    tunning_train_x = train_x.loc[:,items["name"]] 
+    def objective(param):
+        fit_intercept = param["fit_intercept"]
+        normalize = param["normalize"]
+        alphas = np.array([param["a1"],param["a2"],param["a3"]])
+        tuning_pipeline = make_pipeline(RobustScaler(),RidgeCV(fit_intercept=fit_intercept,normalize=normalize,alphas=alphas))
+        loss = -nm_penalty(tuning_pipeline,[tunning_train_x,train_y],np.ones(tunning_train_x.shape[1]))
+        return loss  
+    trials = hyperopt.Trials()
+    best = hyperopt.fmin(objective,
+        space=normal_ridge_dic,
+        algo=hyperopt.tpe.suggest,
+        max_evals=400,
+        trials=trials)      
 
-        best_para = change_best_ridge(best)
-        tunned_result = {}
-        tunned_result["name"] = items["name"]
-        tunned_result["model"] = make_pipeline(RobustScaler(),RidgeCV(**best_para))
-        tunned_result["score"] = -nm_penalty(tunned_result["model"],[tunning_train_x,train_y],np.ones(tunning_train_x.shape[1]))
-        tunned_result["saved_str"] = saved_str+"_"+str(tunned_result["score"])
-        
-        with open(key+"/"+tunned_result["saved_str"]+".pkl","wb") as f:
-            pickle.dump(tunned_result,f)        
-        
-        tunned_result["model"].fit(train_x.loc[:,tunned_result["name"]],train_y)
-        prediction = np.expm1(tunned_result["model"].predict(test_x.loc[:,tunned_result["name"]]))
-        submission = extract_pd(test_x,prediction)  
-        submission.to_csv(key+"/"+tunned_result["saved_str"]+".csv")
+    best_para = change_best_ridge(best)
+    tunned_result = {}
+    tunned_result["name"] = items["name"]
+    tunned_result["model"] = make_pipeline(RobustScaler(),RidgeCV(**best_para))
+    tunned_result["score"] = -nm_penalty(tunned_result["model"],[tunning_train_x,train_y],np.ones(tunning_train_x.shape[1]))
+    tunned_result["saved_str"] = saved_str+"_"+str(tunned_result["score"])
     
+    with open(key+"/"+tunned_result["saved_str"]+".pkl","wb") as f:
+        pickle.dump(tunned_result,f)        
+    
+    tunned_result["model"].fit(train_x.loc[:,tunned_result["name"]],train_y)
+    prediction = np.expm1(tunned_result["model"].predict(test_x.loc[:,tunned_result["name"]]))
+    submission = extract_pd(test_x,prediction)  
+    submission.to_csv(key+"/"+tunned_result["saved_str"]+".csv")
+
        
         

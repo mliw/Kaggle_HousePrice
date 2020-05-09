@@ -79,14 +79,14 @@ if __name__=="__main__":
 
     
     # 2 Load single models
-    kernel_ridge = "kernel_ridge/18_cv_score_0.12159994359671814.pkl"
-    kernel_ridge_1 = "kernel_ridge_1/17_cv_score_0.1251302603769785.pkl"  
-    normal_lassocv = "normal_lassocv/16_cv_score_0.1187955569179603.pkl"
-    normal_ridge_1 = "normal_ridge_1/12_cv_score_0.11878363932182247.pkl" 
-    normal_ridgecv = "normal_ridgecv/15_cv_score_0.11913607429024443_0.11877687235059194.pkl" 
-    svr_2 = "svr_2/21_cv_score_0.1290585687907948_0.11893776133003112.pkl" 
-    lightgbm = "lightgbm/8_cv_score_0.13067732970638146_0.13042870103814302.pkl"
-    xgb = "xgb/8_cv_score_0.12822817177668067.pkl"    
+    kernel_ridge = "kernel_ridge/17_cv_score_0.12110907975377519.pkl"
+    kernel_ridge_1 = "kernel_ridge_1/25_cv_score_0.12388122136649174.pkl"  
+    normal_lassocv = "normal_lassocv/21_cv_score_0.11786094415515441.pkl"
+    normal_ridge_1 = "normal_ridge_1/22_cv_score_0.1164882792148832_0.11636504910398972.pkl" 
+    normal_ridgecv = "normal_ridgecv/21_cv_score_0.1173355741206572_0.11664328989081274.pkl" 
+    svr_2 = "svr_2/24_cv_score_0.12511516251872373_0.11768517142989281.pkl" 
+    lightgbm = "lightgbm/12_cv_score_0.1285526882743979.pkl"
+    xgb = "xgb/14_cv_score_0.12524445314995222.pkl"    
     
     kernel_ridge = extract(kernel_ridge)
     kernel_ridge_1 = extract(kernel_ridge_1)
@@ -129,29 +129,29 @@ if __name__=="__main__":
         print(key,result[key][0])
     print("="*30)
     
-    final_model_list = result[4][1]
-    final_weight,err = test_combination(final_model_list)
-    
- 
-    # 4 Produce weighted prediction,fitting
-    prediction_collect = [] 
-    fitting_collect = []    
-    for my_model in final_model_list:   
-        model = my_model["model"]
-        features = my_model["name"]
-        model.fit(train_x.loc[:,features],train_y)
-        prediction = model.predict(test_x.loc[:,features])
-        fitting = model.predict(train_x.loc[:,features])
-        prediction_collect.append(prediction)
-        fitting_collect.append(fitting)
-    fitting_collect = np.column_stack(fitting_collect)
-    prediction_collect = np.column_stack(prediction_collect)
-    
-    final_fitting = np.sum(fitting_collect*final_weight,axis = 1)
-    final_prediction = np.sum(prediction_collect*final_weight,axis = 1)
-    final_prediction = np.expm1(final_prediction)
-    result = extract_pd(test_x,final_prediction)
-    result.to_csv("stacking/final.csv")
+    for i in range(1,9):
+        final_model_list = result[i][1]
+        final_weight,err = test_combination(final_model_list)
+        
+        # 4 Produce weighted prediction,fitting
+        prediction_collect = [] 
+        fitting_collect = []    
+        for my_model in final_model_list:   
+            model = my_model["model"]
+            features = my_model["name"]
+            model.fit(train_x.loc[:,features],train_y)
+            prediction = model.predict(test_x.loc[:,features])
+            fitting = model.predict(train_x.loc[:,features])
+            prediction_collect.append(prediction)
+            fitting_collect.append(fitting)
+        fitting_collect = np.column_stack(fitting_collect)
+        prediction_collect = np.column_stack(prediction_collect)
+        
+        final_fitting = np.sum(fitting_collect*final_weight,axis = 1)
+        final_prediction = np.sum(prediction_collect*final_weight,axis = 1)
+        final_prediction = np.expm1(final_prediction)
+        sub = extract_pd(test_x,final_prediction)
+        sub.to_csv("stacking/final_"+str(i)+"_"+str(err)+".csv")
     
     
         
