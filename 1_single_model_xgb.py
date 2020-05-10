@@ -105,7 +105,7 @@ if __name__=="__main__":
     populations = 200 
     generations = 30
     selector = FeatureSelectionGA(bench_model,total_data_cache,length_of_features,nm_penalty,probability)
-    print("60 generations are required to find the best individual. Please wait~~")
+    print("30 generations are required to find the best individual. Please wait~~")
     selector.generate(populations,ngen=generations,cxpb=0.1,mutxpb=0.8)
 
     record = selector.best_generations

@@ -6,6 +6,7 @@ import pickle
 import data_help
 N_FOLDS = 10
 
+
 def extract(file_path):
     with open(file_path,"rb") as f:
         result = pickle.load(f)

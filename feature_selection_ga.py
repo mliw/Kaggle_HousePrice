@@ -2,7 +2,6 @@ from deap import base, creator
 import random
 from deap import tools
 import numpy as np
-np.random.binomial(1,0.2,1)
 
 
 def nominal_generator(p):
