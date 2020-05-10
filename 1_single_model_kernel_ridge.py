@@ -94,10 +94,10 @@ if __name__=="__main__":
     
     # 4 Start evolving and tunning
     populations = 200
-    generations = 70
+    generations = 35
     
     selector = FeatureSelectionGA(bench_model,total_data_cache,length_of_features,nm_penalty,probability)
-    print("70 generations are required to find the best individual. Please wait~~")
+    print("35 generations are required to find the best individual. Please wait~~")
     selector.generate(populations,ngen=generations,cxpb=0.1,mutxpb=0.8)
 
     record = selector.best_generations
@@ -121,14 +121,14 @@ if __name__=="__main__":
             result_collect.append(result)
             count+=1            
             
-    # 4.1 Save original models and tunned models
-    for items in result_collect:
-        saved_str = items["saved_str"]        
-        with open(key+"/"+saved_str+".pkl","wb") as f:
-            pickle.dump(items,f)
-        items["model"].fit(train_x.loc[:,items["name"]],train_y)
-        prediction = np.expm1(items["model"].predict(test_x.loc[:,items["name"]]))
-        submission = extract_pd(test_x,prediction)  
-        submission.to_csv(key+"/"+saved_str+".csv")
+    # 4.1 Save the final model
+    items = result_collect[-1]
+    saved_str = items["saved_str"]        
+    with open(key+"/"+saved_str+".pkl","wb") as f:
+        pickle.dump(items,f)
+    items["model"].fit(train_x.loc[:,items["name"]],train_y)
+    prediction = np.expm1(items["model"].predict(test_x.loc[:,items["name"]]))
+    submission = extract_pd(test_x,prediction)  
+    submission.to_csv(key+"/"+saved_str+".csv")
 
         

@@ -1,14 +1,11 @@
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import KFold
-from sklearn.linear_model import Ridge
-from sklearn.ensemble import GradientBoostingRegressor
-from sklearn.svm import SVR
+from xgboost import XGBRegressor
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import RobustScaler
 import data_help
 from feature_selection_ga import FeatureSelectionGA
-from model_help import model_opt
 from sklearn.metrics import mean_squared_error
 import hyperopt
 import pickle
@@ -57,18 +54,20 @@ def nm_penalty(model,total_data_cache,individual):
     return -result
 
 
-def change_best_ridge(best_p):   
-    logi_dic = {0:True,1:False}
-    best = best_p.copy()
-    best["fit_intercept"] = logi_dic[best["fit_intercept"]]
-    best["normalize"] = logi_dic[best["normalize"]]
-    
-    return best
-
-
 def extract_pd(test_x,prediction):    
     result = pd.DataFrame(prediction,index = test_x.index, columns = ["SalePrice"])
     return result
+
+
+def change_best_XGBRegressor(best_p):
+    best = best_p.copy()
+    best["max_depth"]+=1    
+    best["n_estimators"]+=1  
+    best["n_jobs"]=2
+    best["random_state"]=1
+    best["objective"]="reg:squarederror"
+
+    return best
 
 
 if __name__=="__main__":
@@ -82,26 +81,31 @@ if __name__=="__main__":
     
 
     # 2 Define model and parameters
-    normal_ridge = make_pipeline(RobustScaler(), Ridge())
-    normal_ridge_dic = {
-    'alpha':hyperopt.hp.uniform('alpha',0,10), 
-    'fit_intercept':  hyperopt.hp.choice('fit_intercept',[True,False]),   
-    'normalize':  hyperopt.hp.choice('normalize',[True,False])    
+    robust_xgb = make_pipeline(RobustScaler(), XGBRegressor(random_state=1,objective="reg:squarederror",n_jobs=2))
+    XGBRegressor_dic = {
+        'learning_rate': hyperopt.hp.uniform('learning_rate',0,2),
+        'reg_alpha': hyperopt.hp.uniform('reg_alpha',0,2),
+        'reg_lambda': hyperopt.hp.uniform('reg_lambda',0,2),
+        'n_jobs': hyperopt.hp.choice('n_jobs',[2]),
+        'random_state': hyperopt.hp.choice('random_state',[1]),
+        'max_depth': hyperopt.hp.randint('max_depth',11)+1, 
+        'n_estimators': hyperopt.hp.randint('n_estimators',250)+1,    
+        'subsample': hyperopt.hp.uniform('subsample',0,1)
     }
 
     
     # 3 Genetic Algorithm for feature selection
-    key = "normal_ridge_1"
+    key = "xgb"
     probability = 0.4
-    bench_model = normal_ridge
+    bench_model = robust_xgb
     length_of_features = train_x.shape[1]
     
-    # 4 Start evolving and tunning
-    populations = 200
-    generations = 35
     
+    # 4 Start evolving and tunning
+    populations = 200 
+    generations = 30
     selector = FeatureSelectionGA(bench_model,total_data_cache,length_of_features,nm_penalty,probability)
-    print("70 generations are required to find the best individual. Please wait~~")
+    print("60 generations are required to find the best individual. Please wait~~")
     selector.generate(populations,ngen=generations,cxpb=0.1,mutxpb=0.8)
 
     record = selector.best_generations
@@ -138,20 +142,20 @@ if __name__=="__main__":
     # Tunning model_para
     tunning_train_x = train_x.loc[:,items["name"]] 
     def objective(param):
-        tuning_pipeline = make_pipeline(RobustScaler(),Ridge(**param))
+        tuning_pipeline = make_pipeline(RobustScaler(),XGBRegressor(**param))
         loss = -nm_penalty(tuning_pipeline,[tunning_train_x,train_y],np.ones(tunning_train_x.shape[1]))
         return loss  
     trials = hyperopt.Trials()
     best = hyperopt.fmin(objective,
-        space=normal_ridge_dic,
+        space=XGBRegressor_dic,
         algo=hyperopt.tpe.suggest,
         max_evals=1000,
         trials=trials)      
-
-    best_para = change_best_ridge(best)
+    
+    best_para = change_best_XGBRegressor(best)
     tunned_result = {}
     tunned_result["name"] = items["name"]
-    tunned_result["model"] = make_pipeline(RobustScaler(),Ridge(**best_para))
+    tunned_result["model"] = make_pipeline(RobustScaler(),XGBRegressor(**best_para))
     tunned_result["score"] = -nm_penalty(tunned_result["model"],[tunning_train_x,train_y],np.ones(tunning_train_x.shape[1]))
     tunned_result["saved_str"] = saved_str+"_"+str(tunned_result["score"])
     
@@ -163,5 +167,4 @@ if __name__=="__main__":
     submission = extract_pd(test_x,prediction)  
     submission.to_csv(key+"/"+tunned_result["saved_str"]+".csv")
 
-       
-        
+   
