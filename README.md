@@ -5,4 +5,5 @@ Kaggle House Prices: Advanced Regression Techniques.Public Leaderboard Score 0.1
 ## 1 Preface
 I used to rank top5% on [Kaggle House Prices Competition](https://www.kaggle.com/c/house-prices-advanced-regression-techniques).
 
-![Public Score with Multiple Entries](./pics/4.png)
+![](./pics/4.png)
+Public Score with Multiple Entries
