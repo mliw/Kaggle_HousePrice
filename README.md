@@ -12,3 +12,5 @@ However, more than 100 entries were made to achieve this score, which means I'm 
 This repo aims to tell you how to get a score of 0.11701(top10.57%) with only <font color='red'>test blue color font</font>. 
 
 ![Public Score with One Entries](https://github.com/mliw/Kaggle_House_Prices_Advanced_Regression_Techniques_0.11701_top10.6_percent_only_one_entry/blob/master/pics/1.PNG)
+
+<font color=Blue>我是蓝色</font>
