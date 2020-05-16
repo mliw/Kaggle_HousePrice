@@ -21,7 +21,7 @@ This repo aims to tell you how to get a score of 0.11701(top10.57%) with only **
 Greedy algorithm is involved in model stacking(2_stacking.py)
 
 ## 3 Result
-results of stacking are gathered in 
+results of stacking are gathered at [here](https://github.com/mliw/Kaggle_House_Prices_Advanced_Regression_Techniques_0.11701_top10.6_percent_only_one_entry/tree/master/stacking)
 
 
 
