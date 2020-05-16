@@ -14,3 +14,6 @@ This repo aims to tell you how to get a score of 0.11701(top10.57%) with only <f
 ![Public Score with One Entries](https://github.com/mliw/Kaggle_House_Prices_Advanced_Regression_Techniques_0.11701_top10.6_percent_only_one_entry/blob/master/pics/1.PNG)
 
 <font color=Blue>我是蓝色</font>
+
+<font color=#00ffff size=72>color=#00ffff</font>
+
