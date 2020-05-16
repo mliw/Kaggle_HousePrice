@@ -15,5 +15,4 @@ This repo aims to tell you how to get a score of 0.11701(top10.57%) with only <f
 
 <font color=Blue>我是蓝色</font>
 
-<font color=#00ffff size=72>color=#00ffff</font>
-
+\textcolor{blue}{维权}
