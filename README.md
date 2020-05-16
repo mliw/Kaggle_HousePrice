@@ -18,11 +18,12 @@ This repo aims to tell you how to get a score of 0.11701(top10.57%) with only **
 8 base models are involved in this repo, and the optimization of these models is involved in files like 1_single_model_svr_2.py. All files start with "1_" conduct Genetic Algorithm and Bayesian Optimization(hyperopt) independently.
 
 ## 2 Model Stacking
-Greedy algorithm is involved in model stacking(2_stacking.py)
+Greedy algorithm is involved in model stacking(2_stacking.py).
 
 ## 3 Result
-Results of stacking are gathered at [here](https://github.com/mliw/Kaggle_House_Prices_Advanced_Regression_Techniques_0.11701_top10.6_percent_only_one_entry/tree/master/stacking)
+Results of stacking are gathered at [here](https://github.com/mliw/Kaggle_House_Prices_Advanced_Regression_Techniques_0.11701_top10.6_percent_only_one_entry/tree/master/stacking).
 
+The final submission is final_5_0.10117320406891336.csv
 
 
 
