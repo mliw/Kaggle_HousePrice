@@ -9,10 +9,7 @@ I used to rank top5% on [Kaggle House Prices Competition](https://www.kaggle.com
 
 However, more than 100 entries were made to achieve this score, which means I'm actually tuning my model on the test data set. The problem of data leakage arises when you make submissions more than once.
 
-This repo aims to tell you how to get a score of 0.11701(top10.57%) with only <font color='red'>test blue color font</font>. 
+This repo aims to tell you how to get a score of 0.11701(top10.57%) with only **ONE ENTRY**.
 
 ![Public Score with One Entries](https://github.com/mliw/Kaggle_House_Prices_Advanced_Regression_Techniques_0.11701_top10.6_percent_only_one_entry/blob/master/pics/1.PNG)
 
-<font color=Blue>我是蓝色</font>
-
-\textcolor{blue}{维权}
