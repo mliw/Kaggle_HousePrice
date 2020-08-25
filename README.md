@@ -1,4 +1,4 @@
-# Kaggle_House_Prices_Advanced_Regression_Techniques_0.11701_top10.6_only_one_entry
+# 10.6% in Kaggle House Prices Prediction with only one entry
 Kaggle House Prices: Advanced Regression Techniques. Public Leaderboard Score 0.11701 with ONLY ONE ENTRY.
 
 
