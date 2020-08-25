@@ -22,7 +22,6 @@ Greedy algorithm is involved in model stacking(2_stacking.py).
 
 ## Result
 Results of stacking are gathered at [here](https://github.com/mliw/Kaggle_House_Prices_Advanced_Regression_Techniques_0.11701_top10.6_percent_only_one_entry/tree/master/stacking).
-
 The final submission is final_5_0.10117320406891336.csv
 
 
